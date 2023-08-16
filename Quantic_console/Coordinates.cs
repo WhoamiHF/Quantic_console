@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace Quantic_console
 {
+    /**
+     * Class to store x and y coordinate
+     */
     internal class Coordinates
     {
-        int x;
-        int y;
+        readonly int x;
+        readonly int y;
         public Coordinates(int x, int y)
         {
             this.x = x;

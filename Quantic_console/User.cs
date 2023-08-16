@@ -6,13 +6,18 @@ using System.Threading.Tasks;
 
 namespace Quantic_console
 {
+    /**
+     * Class representing user player. Inherits from abstract player. 
+     * In console version instead of coming up with a move, it asks for user input.
+     * 
+     */
     internal class User : Player
     {
-        public User(Piece.Owners player) : base(player)
+        public User(Piece.PlayerID player) : base(player)
         {
         }
 
-        public User(List<Piece> pieces, Piece.Owners player) : base(pieces, player)
+        public User(List<Piece> pieces, Piece.PlayerID player) : base(pieces, player)
         {
         }
 
@@ -20,13 +25,16 @@ namespace Quantic_console
         {
         }
 
-        public override Player copy()
+        public override Player Copy()
         {
             User result = new User(this);
 
             return result;
         }
 
+        /**
+         * In console version this method is used to ask user for input move
+         */
         public override Move? SelectMove(GameLogic gameLogic, Board board, Player current, Player other)
         {
             int x = -1;
@@ -40,21 +48,21 @@ namespace Quantic_console
 
             Console.WriteLine("\nSelect shape - c p r s");
 
-            Piece.Shapes shape = Piece.Shapes.CUBE;
+            Piece.ShapeType shape = Piece.ShapeType.CUBE;
             char key = Console.ReadKey().KeyChar;
             switch (key)
             {
                 case 'c':
-                    shape = Piece.Shapes.CUBE;
+                    shape = Piece.ShapeType.CUBE;
                     break;
                 case 'p':
-                    shape = Piece.Shapes.PYRAMID;
+                    shape = Piece.ShapeType.PYRAMID;
                     break;
                 case 'r':
-                    shape = Piece.Shapes.CYLINDER;
+                    shape = Piece.ShapeType.CYLINDER;
                     break;
                 case 's':
-                    shape = Piece.Shapes.SPHERE;
+                    shape = Piece.ShapeType.SPHERE;
                     break;
             }
 

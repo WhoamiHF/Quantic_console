@@ -6,10 +6,15 @@ using System.Threading.Tasks;
 
 namespace Quantic_console
 {
+    /**
+     * This class is used for storing information about board state. 
+     * The board contains 16 squares, each of them may or may not 
+     * contain a piece placed by user.
+     */
     internal class Board
     {
        
-
+        //Squares to store references to pieces
         private Square[][] _squares;
 
         public Board()
@@ -17,6 +22,9 @@ namespace Quantic_console
             CreateSquares();
         }
 
+        /**
+         * Copy constructor
+         */
         public Board(Board other)
         {
             _squares = new Square[4][];
@@ -31,16 +39,15 @@ namespace Quantic_console
             }
         }
 
-        public Board copy()
+        /**
+         * Method enabling to perform moves on copies of board during minimax
+         */
+        public Board Copy()
         {
             return new Board(this);
         }
-        
-        public Board(Square[][] squares)
-        {
-            this._squares = squares;
-        }
 
+      
         public Square[][] Squares
         {
             get
@@ -49,6 +56,9 @@ namespace Quantic_console
             }
         }
 
+        /**
+         * Method to create four by four grid of squares
+         */
         private void CreateSquares()
         {
             _squares = new Square[4][];

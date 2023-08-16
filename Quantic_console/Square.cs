@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Quantic_console
 {
+    /**
+     * Represents one square on the board. May or may not containg a piece
+     */
     internal class Square
     {
         PlacedPiece? _piece;
@@ -23,6 +26,9 @@ namespace Quantic_console
             this._piece = piece; 
         }
 
+        /**
+         * Gets symbol, used for board drawing
+         */
         public char GetSymbol()
         {
             if(_piece == null)
@@ -31,11 +37,11 @@ namespace Quantic_console
             }
             else
             {
-                return _piece.getSymbol();
+                return _piece.GetSymbol();
             }
         }
         
-        public PlacedPiece Piece
+        public PlacedPiece? Piece
         {
             get
             {

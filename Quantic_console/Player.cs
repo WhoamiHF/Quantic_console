@@ -7,30 +7,42 @@ using System.Threading.Tasks;
 
 namespace Quantic_console
 {
+    /**
+     * Abstract ancestor of user player and computer player. Keeps track of available pieces and selects move to be played
+     */
     internal abstract class Player
     {
-        List<Piece> _pieces;
-        Piece.Owners _player;
+        readonly List<Piece> _pieces;
+        readonly Piece.PlayerID _player;
 
-        public Player(List<Piece> pieces,Piece.Owners player)
+        /**
+         * Constructor with given pieces and player id
+         */
+        public Player(List<Piece> pieces,Piece.PlayerID player)
         {
             this._pieces = pieces;
             this._player = player;
         }
 
-        public Player(Piece.Owners player)
+        /**
+         * Constructor only with given player id - pieces will be all starting eight
+         */
+        public Player(Piece.PlayerID player)
         {
             this._pieces = new List<Piece>();
             for(int i = 0; i < 2; i++)
             {
-                _pieces.Add(new Piece(player, Piece.Shapes.PYRAMID));
-                _pieces.Add(new Piece(player, Piece.Shapes.CUBE));
-                _pieces.Add(new Piece(player, Piece.Shapes.SPHERE));
-                _pieces.Add(new Piece(player, Piece.Shapes.CYLINDER));
+                _pieces.Add(new Piece(player, Piece.ShapeType.PYRAMID));
+                _pieces.Add(new Piece(player, Piece.ShapeType.CUBE));
+                _pieces.Add(new Piece(player, Piece.ShapeType.SPHERE));
+                _pieces.Add(new Piece(player, Piece.ShapeType.CYLINDER));
             }
             this._player = player;
         }
 
+        /**
+         * Copy constructor
+         */
         public Player(Player other)
         {
             this._player = other.Owner;
@@ -42,8 +54,14 @@ namespace Quantic_console
             }
         }
 
-        public abstract Player copy();
+        /**
+         * Copy method used during minimax so pieces will be updated on copy
+         */
+        public abstract Player Copy();
 
+        /**
+         * Selects move or returns null if no move is available
+         */
         public abstract Move? SelectMove(GameLogic logic,Board board,Player current, Player other);
 
         public List<Piece> Pieces { get
@@ -52,7 +70,7 @@ namespace Quantic_console
             }
         }
 
-        public Piece.Owners Owner
+        public Piece.PlayerID Owner
         {
             get
             {

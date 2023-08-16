@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Quantic_gui;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,26 +7,43 @@ using System.Threading.Tasks;
 
 namespace Quantic_console
 {
+    /**
+     * Main class ensure game flow. Creates board, players and if user wants sets second player to be computer.
+     */
     internal class Game
     {
-        Player player1;
+        readonly Player player1;
         Player player2;
-        GameLogic rules;
-        Board board;
+        readonly Board board;
         GameState state;
 
-        enum GameState { PLAYING,FIRST_PLAYER_WON,SECOND_PLAYER_WON}
+        public enum GameState { FIRST_PLAYER_TURN,SECOND_PLAYER_TURN,FIRST_PLAYER_WON,SECOND_PLAYER_WON}
 
         public Game() {
-            player1 = new User(Piece.Owners.PLAYER_ONE);
-            player2 = new User(Piece.Owners.PLAYER_TWO);
-            rules = new GameLogic();
+            player1 = new User(Piece.PlayerID.PLAYER_ONE);
+            player2 = new User(Piece.PlayerID.PLAYER_TWO);
             board = new Board();
             state = new GameState();
         }
 
+        public Player Player1 { get { return player1; } }
+        public Player Player2 { get { return player2; } }
+
+        public GameState State
+        {
+            get { return state; }
+            set { state = value; }
+        }
         public Board Board { get { return board; } }
 
+        //Sets second player to be played by computer
+        public void SetComputerPlayer(Logger logger)
+        {
+            player2 = new ArtificialPlayer(Piece.PlayerID.PLAYER_TWO,logger);
+        }
+
+        //Asks user for decision which scenario of game will be played - player x player, player x computer
+        //Used in console version of the app
         public void GetPlayers()
         {
             bool selected = false;
@@ -43,7 +61,7 @@ namespace Quantic_console
                 else if (choice.Equals('c'))
                 {
                     Console.WriteLine("\nYou have pressed: " + choice + " and chosen to play against computer");
-                    player2 = new ArtificialPlayer(Piece.Owners.PLAYER_TWO);
+                    player2 = new ArtificialPlayer(Piece.PlayerID.PLAYER_TWO,null);
                     selected = true;
                 }
                 else
@@ -53,18 +71,20 @@ namespace Quantic_console
             }
         }
 
+        //This function ensures that each player gets their turn and that game will end when one player wins
+        //Used in console version of the app
         public void PlayGame(BoardViewer viewer)
         {
-            state = GameState.PLAYING;
+            state = GameState.FIRST_PLAYER_TURN;
             GameLogic gameLogic = new GameLogic();
-            while(state == GameState.PLAYING)
+            while(state == GameState.FIRST_PLAYER_TURN || state == GameState.SECOND_PLAYER_TURN)
             {
                 Console.WriteLine("First player's turn");
 
-                if (gameLogic.CheckLoss(Piece.Owners.PLAYER_ONE))
+                if (gameLogic.CheckLoss(Piece.PlayerID.PLAYER_ONE))
                 {
                     state = GameState.SECOND_PLAYER_WON;
-                    viewer.ShowWin(Piece.Owners.PLAYER_TWO);
+                    viewer.ShowWin(Piece.PlayerID.PLAYER_TWO);
                     break;
                 }
 
@@ -77,19 +97,19 @@ namespace Quantic_console
                 }
                 gameLogic.MakeMove(move, board,player1);
 
-                /*List<Move> moves = gameLogic.GetPossibleMoves(player1,null);
+                List<Move> moves = gameLogic.GetCurrentPossibleMoves(player1,null);
                 foreach(Move move2 in moves)
                 {
                     Console.WriteLine($"Move {move2}");
-                }*/
+                }
 
                 if (GameLogic.CheckWin(board, move))
                 {
                     state = GameState.FIRST_PLAYER_WON;
-                    viewer.ShowWin(Piece.Owners.PLAYER_ONE);
+                    viewer.ShowWin(Piece.PlayerID.PLAYER_ONE);
                 }
 
-                if(state != GameState.PLAYING)
+                if(state != GameState.FIRST_PLAYER_TURN && state != GameState.SECOND_PLAYER_TURN)
                 {
                     break;
                 }
@@ -97,10 +117,10 @@ namespace Quantic_console
                 viewer.ViewBoard(board);
 
                 Console.WriteLine("Second player's turn");
-                if (gameLogic.CheckLoss(Piece.Owners.PLAYER_TWO))
+                if (gameLogic.CheckLoss(Piece.PlayerID.PLAYER_TWO))
                 {
                     state = GameState.FIRST_PLAYER_WON;
-                    viewer.ShowWin(Piece.Owners.PLAYER_ONE);
+                    viewer.ShowWin(Piece.PlayerID.PLAYER_ONE);
                     break;
                 }
 
@@ -117,14 +137,15 @@ namespace Quantic_console
                 if (GameLogic.CheckWin(board, move))
                 {
                     state = GameState.SECOND_PLAYER_WON;
-                    viewer.ShowWin(Piece.Owners.PLAYER_TWO);
+                    viewer.ShowWin(Piece.PlayerID.PLAYER_TWO);
+                    break;
                 }
 
-                /*List<Move> moves2 = gameLogic.GetPossibleMoves(player2,null);
+                List<Move> moves2 = gameLogic.GetCurrentPossibleMoves(player2,null);
                 foreach (Move move2 in moves2)
                 {
                     Console.WriteLine($"Move {move2}");
-                }*/
+                }
 
                 viewer.ViewBoard(board);
             }

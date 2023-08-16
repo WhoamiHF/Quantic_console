@@ -8,12 +8,12 @@ namespace Quantic_console
 {
     internal class Piece
     {
-        public enum Shapes { CUBE,SPHERE,PYRAMID,CYLINDER}
-        public enum Owners { PLAYER_ONE,PLAYER_TWO}
-        readonly Shapes _shape;
-        readonly Owners _owner;
+        public enum ShapeType { CUBE,SPHERE,PYRAMID,CYLINDER}
+        public enum PlayerID { PLAYER_ONE,PLAYER_TWO}
+        readonly ShapeType _shape;
+        readonly PlayerID _owner;
 
-        public Shapes Shape
+        public ShapeType Shape
         {
             get
             {
@@ -21,7 +21,7 @@ namespace Quantic_console
             }
         }
 
-        public Owners Owner
+        public PlayerID Owner
         {
             get { 
                 return _owner; 
@@ -29,24 +29,24 @@ namespace Quantic_console
         }
 
 
-        public Piece(Owners owner,Shapes shape)
+        public Piece(PlayerID owner,ShapeType shape)
         {
             this._owner = owner;
             this._shape = shape;
         }
 
-        public Char getSymbol()
+        public char GetSymbol()
         {
             switch (Shape)
             {
-                case Shapes.CUBE:
-                    return ('c');
-                case Shapes.SPHERE:
-                    return ('s');
-                case Shapes.PYRAMID:
-                    return ('p');
-                case Shapes.CYLINDER:
-                    return ('r');
+                case ShapeType.CUBE:
+                    return _owner == PlayerID.PLAYER_ONE ? ('c') : ('C');
+                case ShapeType.SPHERE:
+                    return _owner == PlayerID.PLAYER_ONE ? ('s') : ('S');
+                case ShapeType.PYRAMID:
+                    return _owner == PlayerID.PLAYER_ONE ? ('p') : ('P');
+                case ShapeType.CYLINDER:
+                    return _owner == PlayerID.PLAYER_ONE ? ('r') : ('R');
                 }
             return 'x';
         }
