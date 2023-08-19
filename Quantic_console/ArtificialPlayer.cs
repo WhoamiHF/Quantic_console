@@ -66,7 +66,7 @@ namespace Quantic_console
         {
             HashSet<Piece.ShapeType> shapes = GetUsedShapes(board);
 
-            return MinimaxDepthZero(gameLogic, board,current,other,shapes,-1000,1000).Move!;
+            return MinimaxDepthZero(gameLogic, board,current,other,shapes,-1000,1000).Result.Move!;
         }
 
         /**
@@ -133,7 +133,7 @@ namespace Quantic_console
          * First level of minimax, different by using threads to sped up
          * the computation by using parallel computation via threads
          */
-        private MinimaxResult MinimaxDepthZero(GameLogic gameLogic, Board board,
+        private async Task<MinimaxResult> MinimaxDepthZero(GameLogic gameLogic, Board board,
             Player currentPlayer, Player otherPlayer, HashSet<Piece.ShapeType> usedShapes,
             double alpha, double beta)
         {
@@ -147,9 +147,12 @@ namespace Quantic_console
      
             int finishedThreads = 0;
             Console.WriteLine("number of moves" + moves.Count);
+
+            List<Task> tasks = new List<Task>();
+
             foreach (Move move in moves)
             {
-                ThreadPool.QueueUserWorkItem((state) =>
+                tasks.Add(Task.Run(() =>
                 {
                     WorkerMinimax(gameLogic, currentPlayer,
                     otherPlayer, board, move, usedShapes, alphaBeta, result);
@@ -157,13 +160,11 @@ namespace Quantic_console
                     {
                         finishedThreads++;
                     }
-                });            
+                }));            
             }
 
-            while (finishedThreads < moves.Count) {
-                Thread.Sleep(100);
-            }
-          
+            await Task.WhenAll(tasks);
+
             return result;
         }
 
@@ -199,7 +200,7 @@ namespace Quantic_console
             {
                 if (result.Score == max)
                 {
-                    Console.WriteLine("trimming because of max score for move: " + move);
+                    Console.WriteLine("cancellation because of max!" + move);
                     _cancellationTokenSource.Cancel();
                 }
 
@@ -209,7 +210,7 @@ namespace Quantic_console
                     if (alphaBeta.Beta <= alphaBeta.Alpha)
                     {
                         //Console.WriteLine("prunning depth: " + depth);
-                        Console.WriteLine("trimming because of alpha >= beta for move: " + move);
+                        Console.WriteLine("cancellation because of alphaBeta!" + move);
                         _cancellationTokenSource.Cancel();
                     }
                 }
@@ -229,7 +230,7 @@ namespace Quantic_console
                 return new MinimaxResult(EvaluatePosition(gameLogic, currentPlayer, otherPlayer),null);
             }
 
-            List<Move> moves = gameLogic.GetCurrentPossibleMoves(this,DetermineWhichShapesToConsider(usedShapes));
+            List<Move> moves = gameLogic.GetCurrentPossibleMoves(currentPlayer,DetermineWhichShapesToConsider(usedShapes));
 
             double bestScore = depth % 2 == 0 ? -1000 : 1000;
 
@@ -237,6 +238,7 @@ namespace Quantic_console
             int i = 0;
             foreach (Move move in moves)
             {
+             
                 double score = EvaluateMove(gameLogic, currentPlayer, otherPlayer, board, move, depth,usedShapes,alpha,beta);
                 i++;
 
@@ -275,14 +277,13 @@ namespace Quantic_console
          * Gives evaluation of move by checking whatever the player has won,
          * playing the move and continuing with minimax
          */
-        private Double EvaluateMove(GameLogic gameLogic,Player currentPlayer, Player otherPlayer, 
+        private double EvaluateMove(GameLogic gameLogic,Player currentPlayer, Player otherPlayer, 
             Board board, Move move, int depth,HashSet<Piece.ShapeType> usedShapes, double alpha, double beta)
         {
             GameLogic logicCopy = new GameLogic(gameLogic);
             Player currentPlayerCopy = currentPlayer.Copy();
             Player otherPlayerCopy = otherPlayer.Copy();
             Board boardCopy = board.Copy();
-
 
             logicCopy.MakeMove(move, boardCopy, currentPlayerCopy);
 

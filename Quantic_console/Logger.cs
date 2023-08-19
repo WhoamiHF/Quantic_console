@@ -25,7 +25,7 @@ namespace Quantic_gui
          */
         public void Log(Move move)
         {
-            Log(move.ToString());
+                Log(move.ToString());
         }
 
         /**
@@ -33,17 +33,15 @@ namespace Quantic_gui
          */
         public void Log(string message)
         {
-
-            if (!File.Exists("logs"))
-            {
-                Directory.CreateDirectory("logs");
-            }
-            using (StreamWriter streamWriter = new StreamWriter(filename, true))
-            {
-                streamWriter.WriteLine(message);
-                streamWriter.Close();
-            }
-
+                if (!File.Exists("logs"))
+                {
+                    Directory.CreateDirectory("logs");
+                }
+                using (StreamWriter streamWriter = new StreamWriter(filename, true))
+                {
+                    streamWriter.WriteLine(message);
+                    streamWriter.Close();
+                }
         }
 
     }

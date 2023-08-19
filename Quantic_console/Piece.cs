@@ -40,13 +40,13 @@ namespace Quantic_console
             switch (Shape)
             {
                 case ShapeType.CUBE:
-                    return _owner == PlayerID.PLAYER_ONE ? ('c') : ('C');
+                    return ('c');
                 case ShapeType.SPHERE:
-                    return _owner == PlayerID.PLAYER_ONE ? ('s') : ('S');
+                    return ('s');
                 case ShapeType.PYRAMID:
-                    return _owner == PlayerID.PLAYER_ONE ? ('p') : ('P');
+                    return ('p');
                 case ShapeType.CYLINDER:
-                    return _owner == PlayerID.PLAYER_ONE ? ('r') : ('R');
+                    return ('r');
                 }
             return 'x';
         }
